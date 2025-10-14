@@ -1,0 +1,804 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Proyectos ambientales del Colegio Soledad Acosta de Samper, enfocados en biodiversidad, restauración ecológica y huertas agroecológicas.">
+    <meta name="keywords" content="proyectos ambientales, colegio soledad acosta, PRAE, biodiversidad, restauración ecológica, huerta escolar">
+    <!-- Open Graph -->
+    <meta property="og:title" content="Proyectos Ambientales IED Soledad Acosta de Samper">
+    <meta property="og:description" content="Descubre los proyectos ambientales del Colegio Soledad Acosta de Samper, enfocados en biodiversidad, restauración ecológica y huertas agroecológicas.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.soledadacosta.edu.co/proyectos"> <!-- Cambia por tu URL real -->
+    <meta property="og:image" content="https://www.soledadacosta.edu.co/images/og-image.jpg"> <!-- Cambia por una imagen real -->
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Proyectos Ambientales IED Soledad Acosta de Samper">
+    <meta name="twitter:description" content="Explora nuestros proyectos ambientales enfocados en sostenibilidad y educación.">
+    <meta name="twitter:image" content="https://www.soledadacosta.edu.co/images/og-image.jpg"> <!-- Cambia por una imagen real -->
+    <title>Proyectos Ambientales IED Soledad Acosta de Samper</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'lime-custom': '#a3e635',
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" loading="lazy">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .container {
+            max-width: 900px;
+        }
+        .card {
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(255, 255, 255, 0.1), 0 4px 6px -2px rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(255, 255, 255, 0.1), 0 10px 10px -5px rgba(255, 255, 255, 0.04);
+        }
+        .highlight {
+            background-color: #3b82f6;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+        }
+        /* Modo claro */
+        .light-mode {
+            background-color: #f4f4f4;
+            color: #1f2937;
+        }
+        .light-mode .card {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+        }
+        .light-mode .card:hover {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+        }
+        .light-mode .bg-gray-900 {
+            background-color: #ffffff;
+        }
+        .light-mode .bg-lime-900\/50 {
+            background-color: #d9f99d;
+        }
+        .light-mode .bg-green-900\/50 {
+            background-color: #bbf7d0;
+        }
+        .light-mode .bg-teal-900\/50 {
+            background-color: #99f6e4;
+        }
+        .light-mode .bg-amber-900\/50 {
+            background-color: #fed7aa;
+        }
+        .light-mode .bg-orange-900\/50 {
+            background-color: #fed7aa;
+        }
+        .light-mode .bg-purple-900\/50 {
+            background-color: #e9d5ff;
+        }
+        .light-mode .bg-blue-900\/50 {
+            background-color: #bfdbfe;
+        }
+        .light-mode .bg-emerald-900\/50 {
+            background-color: #6ee7b7;
+        }
+        .light-mode .bg-cyan-900\/50 {
+            background-color: #a5f3fc;
+        }
+        .light-mode .bg-indigo-900\/50 {
+            background-color: #c7d2fe;
+        }
+        .light-mode .bg-yellow-900\/50 {
+            background-color: #fef08a;
+        }
+        .light-mode .bg-lime-800\/50 {
+            background-color: #bef264;
+        }
+        .light-mode .bg-green-800\/50 {
+            background-color: #86efac;
+        }
+        .light-mode .text-lime-400 {
+            color: #4d7c0f;
+        }
+        .light-mode .text-lime-300 {
+            color: #65a30d;
+        }
+        .light-mode .text-lime-200 {
+            color: #84cc16;
+        }
+        .light-mode .text-lime-100 {
+            color: #a3e635;
+        }
+        .light-mode .text-green-400 {
+            color: #15803d;
+        }
+        .light-mode .text-green-300 {
+            color: #16a34a;
+        }
+        .light-mode .text-green-200 {
+            color: #22c55e;
+        }
+        .light-mode .text-green-100 {
+            color: #4ade80;
+        }
+        .light-mode .text-teal-400 {
+            color: #0f766e;
+        }
+        .light-mode .text-teal-300 {
+            color: #14b8a6;
+        }
+        .light-mode .text-teal-200 {
+            color: #2dd4bf;
+        }
+        .light-mode .text-amber-400 {
+            color: #c2410c;
+        }
+        .light-mode .text-amber-300 {
+            color: #ea580c;
+        }
+        .light-mode .text-orange-400 {
+            color: #ea580c;
+        }
+        .light-mode .text-orange-300 {
+            color: #f97316;
+        }
+        .light-mode .text-purple-400 {
+            color: #6b21a8;
+        }
+        .light-mode .text-purple-300 {
+            color: #9333ea;
+        }
+        .light-mode .text-blue-400 {
+            color: #1e40af;
+        }
+        .light-mode .text-blue-300 {
+            color: #3b82f6;
+        }
+        .light-mode .text-emerald-400 {
+            color: #065f46;
+        }
+        .light-mode .text-emerald-300 {
+            color: #059669;
+        }
+        .light-mode .text-cyan-400 {
+            color: #0e7490;
+        }
+        .light-mode .text-cyan-300 {
+            color: #06b6d4;
+        }
+        .light-mode .text-indigo-400 {
+            color: #4f46e5;
+        }
+        .light-mode .text-indigo-300 {
+            color: #6366f1;
+        }
+        .light-mode .text-yellow-400 {
+            color: #a16207;
+        }
+        .light-mode .text-yellow-300 {
+            color: #ca8a04;
+        }
+        .light-mode .text-gray-300 {
+            color: #4b5563;
+        }
+        .light-mode .text-gray-400 {
+            color: #6b7280;
+        }
+        /* Animación para entrada de secciones */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+        }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Estilo para navegación */
+        .nav-link {
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #a3e635;
+        }
+        /* Menú hamburguesa */
+        #menu-toggle {
+            display: none;
+        }
+        #menu-toggle:checked ~ .menu {
+            display: block;
+        }
+        .menu {
+            display: none;
+        }
+        @media (max-width: 640px) {
+            .menu {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: #1f2937;
+                padding: 1rem;
+                border-radius: 0 0 1rem 1rem;
+            }
+            .menu a {
+                display: block;
+                padding: 0.5rem 0;
+            }
+        }
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background-color: #1f2937;
+            padding: 2rem;
+            border-radius: 1rem;
+            max-width: 600px;
+            width: 90%;
+            position: relative;
+        }
+        .light-mode .modal-content {
+            background-color: #ffffff;
+        }
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        /* Estilo para enlaces de redes sociales */
+        .social-link {
+            transition: all 0.3s ease;
+            opacity: 0.8;
+        }
+        .social-link:hover {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+        .handle-text {
+            cursor: pointer;
+            user-select: all;
+        }
+        /* Barra de progreso */
+        #progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background-color: #a3e635;
+            width: 0;
+            z-index: 50;
+            transition: width 0.3s ease;
+        }
+        /* Botón volver arriba */
+        #scroll-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background-color: #a3e635;
+            color: #1f2937;
+            padding: 0.75rem;
+            border-radius: 50%;
+            display: none;
+            z-index: 50;
+            transition: opacity 0.3s ease;
+        }
+        #scroll-top:hover {
+            background-color: #84cc16;
+        }
+        /* Estilo para subsección de proyectos */
+        .sub-section {
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body class="bg-black text-white p-4 sm:p-6">
+    <div id="progress-bar"></div>
+    <button id="scroll-top" aria-label="Volver arriba">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+    <nav class="bg-gray-800 p-4 mb-6 rounded-xl fixed top-0 left-0 right-0 z-40">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center">
+                <i class="fas fa-seedling text-2xl text-lime-400 mr-2" aria-label="Icono de planta"></i>
+                <span class="text-lg font-bold text-lime-300">Soledad Acosta</span>
+            </div>
+            <input type="checkbox" id="menu-toggle" class="hidden">
+            <label for="menu-toggle" class="sm:hidden text-lime-400 cursor-pointer">
+                <i class="fas fa-bars text-2xl" aria-label="Abrir menú"></i>
+            </label>
+            <div class="menu sm:flex sm:space-x-6 sm:items-center">
+                <a href="#prae" class="nav-link text-base sm:text-lg text-lime-300 hover:text-lime-custom">PRAE</a>
+                <a href="#proyectos" class="nav-link text-base sm:text-lg text-lime-300 hover:text-lime-custom">Proyectos</a>
+                <a href="#alianzas" class="nav-link text-base sm:text-lg text-lime-300 hover:text-lime-custom">Alianzas</a>
+                <a href="#redes" class="nav-link text-base sm:text-lg text-lime-300 hover:text-lime-custom">Redes</a>
+            </div>
+        </div>
+    </nav>
+    <button id="theme-toggle" class="fixed top-4 right-4 bg-lime-400 text-black px-4 py-2 rounded-full hover:bg-lime-500 transition z-50" aria-label="Cambiar a modo claro">
+        <i class="fas fa-sun"></i>
+    </button>
+    <main class="container mx-auto bg-gray-900 rounded-3xl shadow-xl p-6 sm:p-10 mt-20">
+        <header class="text-center mb-12 fade-in">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-lime-400 leading-tight">Proyectos Ambientales del Colegio Soledad Acosta de Samper 🏫🌳</h1>
+            <p class="mt-4 text-base sm:text-lg text-lime-300">Un compromiso con la naturaleza y el aprendizaje 💚🌱</p>
+        </header>
+        <!-- Sección del Macroproyecto PRAE -->
+        <section id="prae" class="mb-12 fade-in">
+            <article class="card bg-lime-900/50 p-6 sm:p-8">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-seedling text-3xl sm:text-4xl text-lime-400" aria-label="Icono de planta"></i>
+                    <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-lime-300 ml-4">Macroproyecto PRAE: CON-CIENCIA AMBIENTAL ✨</h2>
+                </div>
+                <p class="text-sm sm:text-base md:text-lg mb-4 leading-relaxed">
+                    Nuestro Proyecto Ambiental Escolar (PRAE) 🌍, liderado por el área de Ciencias Naturales 🔬, busca la transformación de nuestra comunidad educativa. El objetivo es identificar, proteger y estudiar la rica biodiversidad 🦋 del bosque altoandino de la Sabana de Bogotá.
+                </p>
+                <div class="bg-lime-800/50 p-4 rounded-xl mt-4">
+                    <h4 class="text-base sm:text-lg md:text-xl font-semibold text-lime-200 mb-2">Proyectos Articulados:</h4>
+                    <ul class="list-disc list-inside text-lime-100 space-y-2 text-sm sm:text-base">
+                        <li><span class="highlight">Conmemoración de fechas ambientales</span> 🗓️: Sensibilizamos sobre la responsabilidad ciudadana y cristiana con nuestra casa común.</li>
+                        <li><span class="highlight">Ambiente Arte-Sano</span> 🎨: Un proyecto transversal que conecta la salud física y mental con la expresión artística y el medio ambiente.</li>
+                        <li><span class="highlight">Día ecológico</span> 🌿: Damos a conocer la diversidad de ecosistemas y especies nativas para evitar su pérdida.</li>
+                    </ul>
+                </div>
+                <button class="mt-4 bg-lime-400 text-black px-4 py-2 rounded-lg hover:bg-lime-500 transition" data-modal="prae-modal">Más información</button>
+            </article>
+        </section>
+        <!-- Sección de Proyectos -->
+        <section id="proyectos" class="mb-12 fade-in">
+            <h2 class="text-xl sm:text-2xl md:text-3xl font-extrabold text-lime-400 text-center mb-8">Nuestros Proyectos en Acción 🚀</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+                <!-- Grupo de Investigación Escolar PHYLOGOS -->
+                <article class="card bg-green-900/50 p-6 sm:p-8">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-microscope text-3xl sm:text-4xl text-green-400" aria-label="Icono de microscopio"></i>
+                        <h3 class="text-lg sm:text-xl md:text-2xl font-bold text-green-300 ml-4">Grupo de Investigación Escolar PHYLOGOS 🧪</h3>
+                    </div>
+                    <p class="text-sm sm:text-base md:text-lg mb-4 leading-relaxed">
+                        PHYLOGOS, nuestro semillero de investigación 🌱, cuenta con <b>50 estudiantes</b> de <b>grado 5° a 11°</b>. A través de la aplicación del método científico 🧬, exploran y buscan soluciones a problemáticas ambientales. Este proyecto es liderado por el docente de ciencias naturales, <b>Juan Pablo Ospina Ramírez</b>.
+                    </p>
+                    <div class="bg-green-800/50 p-4 rounded-xl mt-4">
+                        <h4 class="text-base sm:text-lg md:text-xl font-semibold text-green-200 mb-2">Enfocados en:</h4>
+                        <ul class="list-disc list-inside text-green-100 space-y-2 text-sm sm:text-base">
+                            <li>Producción de abonos ♻️</li>
+                            <li>Biodiversidad local 🐞</li>
+                            <li>Producción de alimentos 🍎</li>
+                            <li>Germinación y restauración ecológica 🌳</li>
+                        </ul>
+                    </div>
+                    <button class="mt-4 bg-green-400 text-black px-4 py-2 rounded-lg hover:bg-green-500 transition" data-modal="phylogos-modal">Más información</button>
+                </article>
+                <!-- Restauración Ecológica -->
+                <article class="card bg-teal-900/50 p-6 sm:p-8">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-tree text-3xl sm:text-4xl text-teal-400" aria-label="Icono de árbol"></i>
+                        <h3 class="text-lg sm:text-xl md:text-2xl font-bold text-teal-300 ml-4">Restauración Ecológica 🏞️</h3>
+                    </div>
+                    <p class="text-sm sm:text-base md:text-lg leading-relaxed">
+                        En alianza con el <span class="font-semibold text-teal-200">Grupo de Restauración Ecológica de la Universidad Nacional de Colombia (GREUNAL)</span>, nuestros estudiantes líderes de investigación se capacitan en conceptos de biología, botánica y ecología 🌱. Este proyecto, que se inició en 2020, ha permitido a los estudiantes adquirir conocimientos sobre la calidad del suelo y la flora silvestre del colegio.
+                    </p>
+                    <button class="mt-4 bg-teal-400 text-black px-4 py-2 rounded-lg hover:bg-teal-500 transition" data-modal="restauracion-modal">Más información</button>
+                </article>
+                <!-- Huerta Agroecológica Escolar -->
+                <article class="card bg-amber-900/50 p-6 sm:p-8 col-span-1 md:col-span-2">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-hand-holding-heart text-3xl sm:text-4xl text-amber-400" aria-label="Icono de mano con corazón"></i>
+                        <h3 class="text-lg sm:text-xl md:text-2xl font-bold text-amber-300 ml-4">Huerta Agroecológica Escolar 🌻</h3>
+                    </div>
+                    <p class="text-sm sm:text-base md:text-lg leading-relaxed">
+                        Este proyecto se enfoca en la producción de alimentos 🥗 en un espacio que une saberes ecológicos, culturales, científicos y escolares. Busca una convivencia respetuosa con la biodiversidad del sector, integrando el aprendizaje basado en proyectos (ABP) y promoviendo la nutrición saludable. Además, los estudiantes de PHYLOGOS han trabajado en un proyecto llamado <span class="font-semibold">"Sembrando Vidas"</span> para establecer un protocolo eficiente para la germinación y plantación de hortalizas 🍅.
+                    </p>
+                    <button class="mt-4 bg-amber-400 text-black px-4 py-2 rounded-lg hover:bg-amber-500 transition" data-modal="huerta-modal">Más información</button>
+                </article>
+            </div>
+            <!-- Subsección: Proyectos de Investigación PHYLOGOS 2025 -->
+            <div class="sub-section">
+                <h3 class="text-lg sm:text-xl md:text-2xl font-bold text-green-300 text-center mb-6">Proyectos de Investigación PHYLOGOS 2025 🔬</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+                    <!-- Composer 1 -->
+                    <article class="card bg-green-900/50 p-6 sm:p-8">
+                        <div class="flex items-center mb-4">
+                            <span class="text-3xl sm:text-4xl text-green-400" aria-label="Icono de reciclaje">♻️</span>
+                            <h4 class="text-lg sm:text-xl md:text-2xl font-semibold text-green-300 ml-4">Composer 1</h4>
+                        </div>
+                        <p class="text-sm sm:text-base mb-1"><strong>Tema de Investigación 🧪:</strong> Compostaje y gestión de residuos orgánicos</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Línea de Investigación 🌱:</strong> Gestión de residuos</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Investigadores 👥:</strong> Isabella Peña Barreto 1001, Paula Andrea Serrano Fonseca 1001, Laura Camila Serrano Fonseca 1001</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Problema Ambiental ⚠️:</strong> No hay un adecuado protocolo y sistema de producción de abono tipo compost en el colegio que pueda reducir los residuos sólidos orgánicos de la propia institución y de las casas de la comunidad educativa.</p>
+                        <p class="text-sm sm:text-base"><strong>Objetivo General 🎯:</strong> Establecer un sistema de compostaje que ayude a la autogestión de recursos para la huerta escolar.</p>
+                    </article>
+                    <!-- MediPlant -->
+                    <article class="card bg-teal-900/50 p-6 sm:p-8">
+                        <div class="flex items-center mb-4">
+                            <span class="text-3xl sm:text-4xl text-teal-400" aria-label="Icono de planta">🌾</span>
+                            <h4 class="text-lg sm:text-xl md:text-2xl font-semibold text-teal-300 ml-4">MediPlant</h4>
+                        </div>
+                        <p class="text-sm sm:text-base mb-1"><strong>Tema de Investigación 🧪:</strong> Nutrición vegetal</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Línea de Investigación 🌱:</strong> Agroecología</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Investigadores 👥:</strong> Danna Sofía Molina 601, Santiago de Arco 601, Martín Galvis Fajardo 601, Isabella Delgado 601, Samuel Cruz Rodríguez 601</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Problema Ambiental ⚠️:</strong> En la huerta, las plantas sufren por falta de cuidado y una nutrición inadecuada, lo que afecta su crecimiento y desarrollo.</p>
+                        <p class="text-sm sm:text-base"><strong>Objetivo General 🎯:</strong> Mejorar la salud y el crecimiento de las plantas en la huerta a través de una nutrición adecuada y un cuidado responsable.</p>
+                    </article>
+                    <!-- Florixia -->
+                    <article class="card bg-amber-900/50 p-6 sm:p-8">
+                        <div class="flex items-center mb-4">
+                            <span class="text-3xl sm:text-4xl text-amber-400" aria-label="Icono de planta">🌾</span>
+                            <h4 class="text-lg sm:text-xl md:text-2xl font-semibold text-amber-300 ml-4">Florixia</h4>
+                        </div>
+                        <p class="text-sm sm:text-base mb-1"><strong>Tema de Investigación 🧪:</strong> Huertas escolares</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Línea de Investigación 🌱:</strong> Agroecología</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Investigadores 👥:</strong> Ivan Mora 1001, Samay Cañizarez 1001</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Problema Ambiental ⚠️:</strong> Los suelos no son aptos para la agricultura urbana debido a que contienen rocas y escombros al ser un lugar de relleno, hay plagas que perjudican a la huerta y pocas plantas se pueden cosechar debido a la alta mortandad.</p>
+                        <p class="text-sm sm:text-base"><strong>Objetivo General 🎯:</strong> Establecer un sistema agroecológico urbano escolar en el colegio Soledad Acosta de Samper IED.</p>
+                    </article>
+                    <!-- Sembrando vidas -->
+                    <article class="card bg-lime-900/50 p-6 sm:p-8">
+                        <div class="flex items-center mb-4">
+                            <span class="text-3xl sm:text-4xl text-lime-400" aria-label="Icono de planta">🌾</span>
+                            <h4 class="text-lg sm:text-xl md:text-2xl font-semibold text-lime-300 ml-4">Sembrando vidas</h4>
+                        </div>
+                        <p class="text-sm sm:text-base mb-1"><strong>Tema de Investigación 🧪:</strong> Germinación y plantulación</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Línea de Investigación 🌱:</strong> Agroecología</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Investigadores 👥:</strong> Andrea Garcés 1001, Ariana Burgos 1001, Dayana Mejía 1001, Esteban Garcés 802, Yuliana Yalles 701, Solmary López 702</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Problema Ambiental ⚠️:</strong> Actualmente no hay un protocolo de germinación y plantulación que asegure un mayor éxito de siembra de especies de hortalizas en la huerta escolar, ya que debido a eso hay problemas en la producción de plantas teniendo una tasa baja de poblaciones.</p>
+                        <p class="text-sm sm:text-base"><strong>Objetivo General 🎯:</strong> Establecer un protocolo de germinación y plantulación en especies de huerta, adaptado al contexto en el Colegio Soledad Acosta de Samper.</p>
+                    </article>
+                    <!-- La colmena -->
+                    <article class="card bg-blue-900/50 p-6 sm:p-8">
+                        <div class="flex items-center mb-4">
+                            <span class="text-3xl sm:text-4xl text-blue-400" aria-label="Icono de insecto">🐞</span>
+                            <h4 class="text-lg sm:text-xl md:text-2xl font-semibold text-blue-300 ml-4">La colmena</h4>
+                        </div>
+                        <p class="text-sm sm:text-base mb-1"><strong>Tema de Investigación 🧪:</strong> Artropofauna</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Línea de Investigación 🌱:</strong> Biodiversidad</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Investigadores 👥:</strong> Laura Guzmán 702, Ayleen López 702, Sara Hernández 702, Laura Hernández 702, Samuel Calderón 702</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Problema Ambiental ⚠️:</strong> Los estudiantes matan diferentes artrópodos en el colegio, también hay fauna plaga que afecta a las plantas en el colegio, y además hay desconocimiento del tipo de especies que hay y su importancia o impacto en el colegio.</p>
+                        <p class="text-sm sm:text-base"><strong>Objetivo General 🎯:</strong> Conocer las poblaciones de artropofauna presentes en el colegio Soledad Acosta de Samper para su identificación, cuidado y divulgación.</p>
+                    </article>
+                    <!-- Las palomitas -->
+                    <article class="card bg-purple-900/50 p-6 sm:p-8">
+                        <div class="flex items-center mb-4">
+                            <span class="text-3xl sm:text-4xl text-purple-400" aria-label="Icono de insecto">🐞</span>
+                            <h4 class="text-lg sm:text-xl md:text-2xl font-semibold text-purple-300 ml-4">Las palomitas</h4>
+                        </div>
+                        <p class="text-sm sm:text-base mb-1"><strong>Tema de Investigación 🧪:</strong> Avifauna</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Línea de Investigación 🌱:</strong> Biodiversidad</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Investigadores 👥:</strong> Laura Ruiz 702, Alejandra Gonzáles 701, Elen Vergel 701, Laura Pérez 701, Camila Roa 701, María José Cárdenas 701</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Problema Ambiental ⚠️:</strong> En el colegio Soledad Acosta de Samper y sus alrededores las poblaciones de avifauna tienen limitados recursos hídricos, alimenticios o refugios, teniendo que desplazarse muchos kilómetros para satisfacer sus necesidades biológicas.</p>
+                        <p class="text-sm sm:text-base"><strong>Objetivo General 🎯:</strong> Conocer las poblaciones de avifauna presentes en el colegio Soledad Acosta de Samper para su identificación, cuidado y divulgación.</p>
+                    </article>
+                    <!-- Tierra viva -->
+                    <article class="card bg-orange-900/50 p-6 sm:p-8">
+                        <div class="flex items-center mb-4">
+                            <span class="text-3xl sm:text-4xl text-orange-400" aria-label="Icono de planta">🌾</span>
+                            <h4 class="text-lg sm:text-xl md:text-2xl font-semibold text-orange-300 ml-4">Tierra viva</h4>
+                        </div>
+                        <p class="text-sm sm:text-base mb-1"><strong>Tema de Investigación 🧪:</strong> Lombricompostador</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Línea de Investigación 🌱:</strong> Agroecología</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Investigadores 👥:</strong> Nicole López 801, Bianca Vargas 802, Mariana Parra 801</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Problema Ambiental ⚠️:</strong> En la actualidad, las lombrices rojas californianas que se encuentran en el laboratorio de Biología, no cuentan con un diagnóstico del estado de su recinto, las tasas de reproducción o mantenimiento.</p>
+                        <p class="text-sm sm:text-base"><strong>Objetivo General 🎯:</strong> Establecer un protocolo de gestión del lombricultivo en su mantenimiento, reproducción y cosecha en el colegio Soledad Acosta de Samper IED.</p>
+                    </article>
+                    <!-- Sembrando conciencia ambiental -->
+                    <article class="card bg-emerald-900/50 p-6 sm:p-8">
+                        <div class="flex items-center mb-4">
+                            <span class="text-3xl sm:text-4xl text-emerald-400" aria-label="Icono de libro">📚</span>
+                            <h4 class="text-lg sm:text-xl md:text-2xl font-semibold text-emerald-300 ml-4">Sembrando conciencia ambiental</h4>
+                        </div>
+                        <p class="text-sm sm:text-base mb-1"><strong>Tema de Investigación 🧪:</strong> Educación en gestión en residuos</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Línea de Investigación 🌱:</strong> Educación Ambiental</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Investigadores 👥:</strong> Karol Bernal 901, Ariana Gómez 901, Dina Romero 901</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Problema Ambiental ⚠️:</strong> En el colegio Soledad Acosta de Samper, se muestra poco interés en la correcta gestión de residuos sólidos principalmente en las canecas lo cual conlleva problemas ambientales.</p>
+                        <p class="text-sm sm:text-base"><strong>Objetivo General 🎯:</strong> Promover la correcta gestión de residuos sólidos orgánicos en el Colegio Soledad Acosta de Samper.</p>
+                    </article>
+                    <!-- Conmemorando la lucha ambiental -->
+                    <article class="card bg-cyan-900/50 p-6 sm:p-8">
+                        <div class="flex items-center mb-4">
+                            <span class="text-3xl sm:text-4xl text-cyan-400" aria-label="Icono de libro">📚</span>
+                            <h4 class="text-lg sm:text-xl md:text-2xl font-semibold text-cyan-300 ml-4">Conmemorando la lucha ambiental</h4>
+                        </div>
+                        <p class="text-sm sm:text-base mb-1"><strong>Tema de Investigación 🧪:</strong> Fechas Ambientales</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Línea de Investigación 🌱:</strong> Educación ambiental</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Investigadores 👥:</strong> Castellar Sayuris 1001, Paula Melo 1001, Laura Amezquita 1001</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Problema Ambiental ⚠️:</strong> Falta de sensibilización sobre fechas ambientales en la comunidad educativa.</p>
+                        <p class="text-sm sm:text-base"><strong>Objetivo General 🎯:</strong> Sensibilizar a la comunidad educativa sobre la importancia de las fechas ambientales para fomentar la responsabilidad ambiental.</p>
+                    </article>
+                    <!-- Tetrasquel -->
+                    <article class="card bg-indigo-900/50 p-6 sm:p-8">
+                        <div class="flex items-center mb-4">
+                            <span class="text-3xl sm:text-4xl text-indigo-400" aria-label="Icono de libro">📚</span>
+                            <h4 class="text-lg sm:text-xl md:text-2xl font-semibold text-indigo-300 ml-4">Tetrasquel</h4>
+                        </div>
+                        <p class="text-sm sm:text-base mb-1"><strong>Tema de Investigación 🧪:</strong> Educación ambiental</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Línea de Investigación 🌱:</strong> Educación ambiental</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Investigadores 👥:</strong> Sofía Ceija 1001, Juliana Machuca 801, Saray Romero 802, Mariana Beltrán 802</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Problema Ambiental ⚠️:</strong> En la huerta, las plantas sufren por falta de cuidado y una nutrición inadecuada, lo que afecta su crecimiento y desarrollo.</p>
+                        <p class="text-sm sm:text-base"><strong>Objetivo General 🎯:</strong> Mejorar la salud y el crecimiento de las plantas en la huerta a través de una nutrición adecuada y un cuidado responsable.</p>
+                    </article>
+                    <!-- Proyecto de Divulgación Ambiental -->
+                    <article class="card bg-yellow-900/50 p-6 sm:p-8">
+                        <div class="flex items-center mb-4">
+                            <span class="text-3xl sm:text-4xl text-yellow-400" aria-label="Icono de megáfono">📢</span>
+                            <h4 class="text-lg sm:text-xl md:text-2xl font-semibold text-yellow-300 ml-4">Proyecto de Divulgación Ambiental</h4>
+                        </div>
+                        <p class="text-sm sm:text-base mb-1"><strong>Tema de Investigación 🧪:</strong> Divulgación</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Línea de Investigación 🌱:</strong> Divulgación</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Investigadores 👥:</strong> Dante Esteban Fuentes Velásquez</p>
+                        <p class="text-sm sm:text-base mb-1"><strong>Problema Ambiental ⚠️:</strong> Visibilizar y divulgar el proyecto de compostaje escolar de manera efectiva para generar conciencia ambiental, participación activa y compromiso de la comunidad educativa del Colegio Soledad Acosta de Samper.</p>
+                        <p class="text-sm sm:text-base"><strong>Objetivo General 🎯:</strong> Diseñar e implementar una estrategia de divulgación ambiental que permita informar y sensibilizar a la comunidad escolar sobre el trabajo del semillero de investigación en educación ambiental, enfocándose en el proceso de compostaje escolar.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+        <!-- Sección de Alianzas y Logros -->
+        <section id="alianzas" class="mb-12 fade-in">
+            <h2 class="text-xl sm:text-2xl md:text-3xl font-extrabold text-lime-400 text-center mb-8">Alianzas y Logros Destacados 🤝🏅</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+                <!-- Secretaría Distrital de Salud -->
+                <article class="card bg-orange-900/50 p-6 sm:p-8">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-hospital-user text-3xl sm:text-4xl text-orange-400" aria-label="Icono de hospital"></i>
+                        <h3 class="text-lg sm:text-xl md:text-2xl font-bold text-orange-300 ml-4">Secretaría Distrital de Salud 🧡</h3>
+                    </div>
+                    <p class="text-sm sm:text-base md:text-lg leading-relaxed">
+                        Fuimos seleccionados por la Secretaría Distrital de Salud (SDS) para recibir apoyo en recursos y conocimientos 🧠 sobre huertas escolares 🥕 y nutrición saludable. Esta alianza se reactivó en 2024 para fortalecer el proyecto de huertas y promover hábitos de alimentación en la comunidad.
+                    </p>
+                    <button class="mt-4 bg-orange-400 text-black px-4 py-2 rounded-lg hover:bg-orange-500 transition" data-modal="salud-modal">Más información</button>
+                </article>
+                <!-- Propuesta SED-STEAM+ -->
+                <article class="card bg-purple-900/50 p-6 sm:p-8">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-laptop-code text-3xl sm:text-4xl text-purple-400" aria-label="Icono de laptop con código"></i>
+                        <h3 class="text-lg sm:text-xl md:text-2xl font-bold text-purple-300 ml-4">Propuesta SED-STEAM+ 💻</h3>
+                    </div>
+                    <p class="text-sm sm:text-base md:text-lg leading-relaxed">
+                        Nuestra propuesta, que articula proyectos transversales en ciencia, tecnología, ingeniería, artes y matemáticas, obtuvo un puntaje de <span class="font-semibold">12.9/20</span>, ubicándonos en la <span class="font-semibold">segunda categoría</span> 🎉 en el cierre de la propuesta STEAM+ 2022 de la Secretaría de Educación Distrital (SED).
+                    </p>
+                    <button class="mt-4 bg-purple-400 text-black px-4 py-2 rounded-lg hover:bg-purple-500 transition" data-modal="steam-modal">Más información</button>
+                </article>
+                <!-- Salidas Pedagógicas -->
+                <article class="card bg-blue-900/50 p-6 sm:p-8 col-span-1 md:col-span-2">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-walking text-3xl sm:text-4xl text-blue-400" aria-label="Icono de caminata"></i>
+                        <h3 class="text-lg sm:text-xl md:text-2xl font-bold text-blue-300 ml-4">Salidas Pedagógicas 🚶‍♂️</h3>
+                    </div>
+                    <p class="text-sm sm:text-base md:text-lg leading-relaxed">
+                        Se han realizado salidas pedagógicas para complementar el aprendizaje, como la visita al sendero ecológico de la <span class="font-semibold">Quebrada La Vieja</span> y al <span class="font-semibold">sendero occidental del río Bogotá</span> en la actividad "Bici-tando Territorios" 🚲. Estas experiencias buscan que los estudiantes reconozcan las situaciones ambientales de sus alrededores y apliquen sus conocimientos en el mundo real.
+                    </p>
+                    <button class="mt-4 bg-blue-400 text-black px-4 py-2 rounded-lg hover:bg-blue-500 transition" data-modal="salidas-modal">Más información</button>
+                </article>
+            </div>
+        </section>
+        <!-- Sección de Redes Sociales -->
+        <section id="redes" class="mt-12 fade-in">
+            <h2 class="text-xl sm:text-2xl md:text-3xl font-extrabold text-lime-400 text-center mb-8">Síguenos en nuestras redes 📲</h2>
+            <div class="flex flex-col items-center justify-center space-y-4 md:space-y-0 md:flex-row md:space-x-8">
+                <!-- Facebook -->
+                <a href="https://www.facebook.com/PhylogosFuturo" class="social-link flex items-center space-x-2 text-base sm:text-lg text-gray-300 hover:text-lime-custom transition" target="_blank" rel="noopener noreferrer" title="Abrir en Facebook">
+                    <i class="fab fa-facebook-square text-2xl sm:text-3xl" aria-label="Icono de Facebook"></i>
+                    <span class="font-semibold handle-text">@PhylogosFuturo</span>
+                </a>
+                <!-- Instagram -->
+                <a href="https://www.instagram.com/phylogosfuturo" class="social-link flex items-center space-x-2 text-base sm:text-lg text-gray-300 hover:text-lime-custom transition" target="_blank" rel="noopener noreferrer" title="Abrir en Instagram">
+                    <i class="fab fa-instagram-square text-2xl sm:text-3xl" aria-label="Icono de Instagram"></i>
+                    <span class="font-semibold handle-text">@phylogosfuturo</span>
+                </a>
+                <!-- Email -->
+                <a href="mailto:phylogosfuturo@gmail.com" class="social-link flex items-center space-x-2 text-base sm:text-lg text-gray-300 hover:text-lime-custom transition" title="Enviar email al proyecto">
+                    <i class="fas fa-envelope-square text-2xl sm:text-3xl" aria-label="Icono de correo electrónico"></i>
+                    <span class="font-semibold">phylogosfuturo@gmail.com</span>
+                </a>
+            </div>
+        </section>
+        <footer class="mt-12 text-center text-gray-400 text-sm fade-in">
+            <p>&copy; 2025 Colegio Soledad Acosta de Samper IED. Todos los derechos reservados. ✨</p>
+        </footer>
+    </main>
+    <!-- Modales -->
+    <div id="prae-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" aria-label="Cerrar modal">&times;</span>
+            <h3 class="text-xl sm:text-2xl font-bold text-lime-300 mb-4">Macroproyecto PRAE</h3>
+            <p class="text-sm sm:text-base">El PRAE fomenta la conciencia ambiental a través de actividades educativas y prácticas sostenibles, integrando a toda la comunidad escolar en la protección del medio ambiente.</p>
+        </div>
+    </div>
+    <div id="phylogos-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" aria-label="Cerrar modal">&times;</span>
+            <h3 class="text-xl sm:text-2xl font-bold text-green-300 mb-4">Grupo de Investigación PHYLOGOS</h3>
+            <p class="text-sm sm:text-base">PHYLOGOS empodera a los estudiantes para investigar y proponer soluciones innovadoras a problemas ambientales, aplicando el método científico.</p>
+        </div>
+    </div>
+    <div id="restauracion-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" aria-label="Cerrar modal">&times;</span>
+            <h3 class="text-xl sm:text-2xl font-bold text-teal-300 mb-4">Restauración Ecológica</h3>
+            <p class="text-sm sm:text-base">En colaboración con GREUNAL, este proyecto capacita a los estudiantes en técnicas de restauración para preservar la flora y el suelo de la región.</p>
+        </div>
+    </div>
+    <div id="huerta-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" aria-label="Cerrar modal">&times;</span>
+            <h3 class="text-xl sm:text-2xl font-bold text-amber-300 mb-4">Huerta Agroecológica Escolar</h3>
+            <p class="text-sm sm:text-base">La huerta escolar promueve la producción sostenible de alimentos y la educación en nutrición saludable, integrando saberes culturales y científicos.</p>
+        </div>
+    </div>
+    <div id="salud-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" aria-label="Cerrar modal">&times;</span>
+            <h3 class="text-xl sm:text-2xl font-bold text-orange-300 mb-4">Secretaría Distrital de Salud</h3>
+            <p class="text-sm sm:text-base">Esta alianza fortalece nuestras iniciativas de huertas escolares y promueve hábitos de vida saludable en la comunidad educativa.</p>
+        </div>
+    </div>
+    <div id="steam-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" aria-label="Cerrar modal">&times;</span>
+            <h3 class="text-xl sm:text-2xl font-bold text-purple-300 mb-4">Propuesta SED-STEAM+</h3>
+            <p class="text-sm sm:text-base">Nuestra propuesta STEAM+ integra disciplinas para fomentar la creatividad y el pensamiento crítico en proyectos ambientales.</p>
+        </div>
+    </div>
+    <div id="salidas-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" aria-label="Cerrar modal">&times;</span>
+            <h3 class="text-xl sm:text-2xl font-bold text-blue-300 mb-4">Salidas Pedagógicas</h3>
+            <p class="text-sm sm:text-base">Las salidas pedagógicas permiten a los estudiantes conectar el aprendizaje en el aula con experiencias prácticas en entornos naturales.</p>
+        </div>
+    </div>
+    <script defer>
+        // Alternar modo claro/oscuro
+        const toggleButton = document.getElementById('theme-toggle');
+        toggleButton.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            toggleButton.innerHTML = document.body.classList.contains('light-mode')
+                ? '<i class="fas fa-moon" aria-label="Cambiar a modo oscuro"></i>'
+                : '<i class="fas fa-sun" aria-label="Cambiar a modo claro"></i>';
+        });
+
+        // Atajo de teclado para cambio de tema
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 't' && e.ctrlKey) {
+                document.body.classList.toggle('light-mode');
+                toggleButton.innerHTML = document.body.classList.contains('light-mode')
+                    ? '<i class="fas fa-moon" aria-label="Cambiar a modo oscuro"></i>'
+                    : '<i class="fas fa-sun" aria-label="Cambiar a modo claro"></i>';
+            }
+        });
+
+        // Desplazamiento suave para enlaces de navegación
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    document.getElementById('menu-toggle').checked = false;
+                }
+            });
+        });
+
+        // Animación de entrada con Intersection Observer
+        const fadeIns = document.querySelectorAll('.fade-in');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        fadeIns.forEach(element => observer.observe(element));
+
+        // Gestión de modales
+        const modalButtons = document.querySelectorAll('[data-modal]');
+        const modals = document.querySelectorAll('.modal');
+        const closeButtons = document.querySelectorAll('.close-modal');
+
+        modalButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const modalId = button.getAttribute('data-modal');
+                const modal = document.getElementById(modalId);
+                modal.style.display = 'flex';
+            });
+        });
+
+        closeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                button.closest('.modal').style.display = 'none';
+            });
+        });
+
+        modals.forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                modals.forEach(modal => modal.style.display = 'none');
+            }
+        });
+
+        // Barra de progreso
+        const progressBar = document.getElementById('progress-bar');
+        window.addEventListener('scroll', () => {
+            const totalHeight = document.body.scrollHeight - window.innerHeight;
+            const progress = (window.scrollY / totalHeight) * 100;
+            progressBar.style.width = `${progress}%`;
+        });
+
+        // Botón volver arriba
+        const scrollTopButton = document.getElementById('scroll-top');
+        window.addEventListener('scroll', () => {
+            scrollTopButton.style.display = window.scrollY > 200 ? 'block' : 'none';
+        });
+        scrollTopButton.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
